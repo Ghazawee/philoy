@@ -10,7 +10,8 @@ void	gs_sleep(int time, t_philo *philo) // maybe return 0/1 if philo is dead or 
 	{
 		if (check_dead(philo->phdata))
 			return ;
-		usleep(100);
+		//usleep(100);
+		usleep(time/10);
 		//action -= 1;
 	}
 }
@@ -32,14 +33,15 @@ int log_think(t_phdata *phdata, t_philo *philo, int id, char *msg)
 
 int	gs_logs(t_phdata *phdata, int id, char *msg)
 {
-	
+	if(check_dead(phdata))
+		return (1);
 	pthread_mutex_lock(&phdata->print);
 	if(check_dead(phdata))
 	{
 		pthread_mutex_unlock(&phdata->print);
 		return (1);
 	}
-	printf("%ld Philosopher %d %s\n", get_time() - phdata->start_time, id, msg);
+	printf("%ld %d %s\n", get_time() - phdata->start_time, id, msg);
 	pthread_mutex_unlock(&phdata->print);
 	return (0);
 }
@@ -48,30 +50,44 @@ void	unlock_fork(t_philo *philo) // remove waiter from the function, this will o
 {
 	int first;
 	int second;
-	int next_left;
-	int next_right;
-	pick_order(philo, &first, &second);
-	next_left = (philo->id % philo->phdata->num_philo);
-	next_right = ((philo->id + 1) % philo->phdata->num_philo);
 
+	pick_order(philo, &first, &second);
 	pthread_mutex_lock(&philo->phdata->forks[first]);
 	pthread_mutex_lock(&philo->phdata->forks[second]);
 
-	// Update ownership
-	philo->phdata->f_owner[first] = next_left;
-	philo->phdata->f_owner[second] = next_right;
-
+	// philo->phdata->forks_st[first] = 1;
+	// philo->phdata->forks_st[second] = 1;
+	// next = (philo->id % philo->phdata->num_philo) + 1;
+	// if (first == philo->l_fork)
+	// {
+	// 	philo->phdata->f_owner[first] = ((philo->id)% philo->phdata->num_philo);
+	// 	philo->phdata->f_owner[second] = ((philo->id -1) % philo->phdata->num_philo);
+	// }
+	// else
+	// {
+	// 	philo->phdata->f_owner[first] = ((philo->id - 1) % philo->phdata->num_philo);
+	// 	philo->phdata->f_owner[second] = ((philo->id) % philo->phdata->num_philo);
+	// }
 	// pthread_mutex_lock(&philo->phdata->forks[first]);
 	// pthread_mutex_lock(&philo->phdata->forks[second]);
+	// philo->phdata->f_owner[first] = next -1;
+	// philo->phdata->f_owner[second] = next - 1;
 	philo->phdata->forks_st[first] = 1;
 	philo->phdata->forks_st[second] = 1;
-	pthread_mutex_unlock(&philo->phdata->forks[first]);
 	pthread_mutex_unlock(&philo->phdata->forks[second]);
-
+	pthread_mutex_unlock(&philo->phdata->forks[first]);
+	// if (philo->phdata->num_philo % 2 && philo->id % 2)
+	// {
+	// 	// if (philo->id %  == 0)
+	// 	usleep(philo->phdata->time_to_eat / 5);
+	// 		// usleep(500);
+	// }
 }
 
 void	philo_eat(t_philo *philo)
 {
+	if(check_dead(philo->phdata))
+		return ;
 	if (gs_logs(philo->phdata, philo->id, "has taken a fork"))
 	{
 		unlock_fork(philo);
@@ -93,6 +109,12 @@ void	philo_eat(t_philo *philo)
 	philo->meals_count++;
 	pthread_mutex_unlock(&philo->phdata->state);
 	unlock_fork(philo);
+	// if (philo->phdata->num_philo % 2 && philo->id % 2)
+	// {
+		// if (philo->id %  == 0)
+		// usleep(philo->phdata->time_to_eat / 5);
+			// usleep(500);
+	// }
 }
 
 void	*handle_one_philo(t_philo *philo)
@@ -152,38 +174,48 @@ int	is_forks_pickable(t_philo *philo)
 	// current_time = get_time();
 	// hunger_level = current_time - philo->last_meal;
 	
-	// if (philo->phdata->num_philo % 2 && philo->meals_count > 0 && hunger_level < philo->phdata->time_to_eat * 2)
+	// if(philo->phdata->num_philo % 2 == 0 && philo->meals_count > 0 && hunger_level < philo->phdata->time_to_eat * (1 + (philo->id % 3) * 0.2))
 	// 	return (0);
-
+	// if (philo->phdata->num_philo % 2 && philo->meals_count > 0 && hunger_level < philo->phdata->time_to_eat * 2)
+	//  	return (0);
+	// if (philo->phdata->num_philo % 2 && philo->meals_count > 0 && hunger_level < philo->phdata->time_to_eat * (1 + (philo->id % 3) * 0.2))	
+	
 	pick_order(philo, &first, &second);
-	pthread_mutex_lock(&philo->phdata->forks[first]);
-	if (philo->phdata->forks_st[first] == 0 && philo->phdata->f_owner[first] != philo->id - 1)
-	{
-		pthread_mutex_unlock(&philo->phdata->forks[first]);
-		return (0);
-	}
-	pthread_mutex_lock(&philo->phdata->forks[second]);
-	if (philo->phdata->forks_st[first] == 0 && philo->phdata->f_owner[second] != philo->id - 1)
-	{
-		pthread_mutex_unlock(&philo->phdata->forks[second]);
-		pthread_mutex_unlock(&philo->phdata->forks[first]);
-		return (0);
-	}
 	// pthread_mutex_lock(&philo->phdata->forks[first]);
-	// if (philo->phdata->forks_st[first] == 0)
+	// if (philo->phdata->forks_st[first] == 0 
+	// 	&& (philo->phdata->f_owner[first] != philo->id - 1))
 	// {
 	// 	pthread_mutex_unlock(&philo->phdata->forks[first]);
 	// 	return (0);
 	// }
 	// pthread_mutex_lock(&philo->phdata->forks[second]);
-	// if (philo->phdata->forks_st[second] == 0)
+	// if (philo->phdata->forks_st[second] == 0 
+	// 	&& (philo->phdata->f_owner[second] != philo->id - 1))
 	// {
 	// 	pthread_mutex_unlock(&philo->phdata->forks[second]);
 	// 	pthread_mutex_unlock(&philo->phdata->forks[first]);
 	// 	return (0);
 	// }
+	// philo->phdata->forks_st[second] = 0;
+	// philo->phdata->f_owner[second] = ((philo->id) % philo->phdata->num_philo);
+	// printf("forks_st[second] = %d f_owner = %d\n", philo->phdata->forks_st[second], philo->phdata->f_owner[second]);
+	pthread_mutex_lock(&philo->phdata->forks[first]);
+	if (philo->phdata->forks_st[first] == 0)
+	{
+		pthread_mutex_unlock(&philo->phdata->forks[first]);
+		return (0);
+	}
+	pthread_mutex_lock(&philo->phdata->forks[second]);
+	if (philo->phdata->forks_st[second] == 0)
+	{
+		pthread_mutex_unlock(&philo->phdata->forks[second]);
+		pthread_mutex_unlock(&philo->phdata->forks[first]);
+		return (0);
+	}
 	philo->phdata->forks_st[first] = 0;
 	philo->phdata->forks_st[second] = 0;
+	// philo->phdata->f_owner[first] = philo->id -1;
+	// philo->phdata->f_owner[second] = philo->id - 1;
 	pthread_mutex_unlock(&philo->phdata->forks[second]);
 	pthread_mutex_unlock(&philo->phdata->forks[first]);
 	return (1);
@@ -204,8 +236,10 @@ void    *gs_routi(void *arg)
 		// 	usleep(200);
 		// }
 	// }
-	// if (philo->id % 2 == 0)
-	// 	usleep(philo->phdata->time_to_eat * 1000 / 2);
+	if (philo->id % 2 == 0)
+		usleep(500);
+		// usleep(philo->phdata->time_to_eat * 8.33);
+		// usleep(philo->phdata->time_to_eat * 1000 / 2);
 	// else
 	// 	usleep(philo->phdata->time_to_eat * 500);
 	while(!check_dead(philo->phdata))
@@ -219,14 +253,19 @@ void    *gs_routi(void *arg)
 				return (NULL);
 			if (gs_logs(philo->phdata, philo->id, "is sleeping"))
 				return (NULL);
-			gs_sleep(philo->phdata->time_to_sleep, philo);
+			gs_sleep(philo->phdata->time_to_sleep, philo); // maybe turn 
 			//continue ;
+			if(check_dead(philo->phdata))
+				return (NULL);
 			if (gs_logs(philo->phdata, philo->id, "is thinking"))
 				return (NULL);
+			// usleep(philo->phdata->time_to_eat * 4.17);
+			usleep(250);
 		}
 		else
 		{
-			usleep(500);
+			usleep(philo->phdata->time_to_eat / 5);
+			//usleep(500);
 		}
 	}
 	return (NULL);

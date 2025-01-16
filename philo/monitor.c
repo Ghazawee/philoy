@@ -73,7 +73,7 @@ void    *gs_mont(void *arg)
 			lock_set_unlock(&phdata->stop_mutex, &phdata->stop_sim, 1);
 			return (NULL);
 		}
-		//usleep(1000);
+		usleep(100);
 	}
 	return (NULL);
 }
