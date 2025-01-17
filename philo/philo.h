@@ -18,6 +18,8 @@ typedef	struct	s_philo
 	int		 		meals_count;
 	int         	last_meal;
 	int				is_thinking;
+	int		        ate;
+	int				permission;
 	// pthread_mutex_t	*l_fork;
 	// pthread_mutex_t	*r_fork;
 	int				l_fork;

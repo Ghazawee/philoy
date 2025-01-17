@@ -111,11 +111,14 @@ void init_philo(t_phdata *phdata)
 	while (i < phdata->num_philo)
 	{
 		phdata->philo[i].id = i + 1;
+		phdata->philo[i].permission = i + 1;
 		phdata->philo[i].meals_count = 0;
 		phdata->philo[i].last_meal = phdata->start_time;
 		phdata->philo[i].l_fork = i ;
 		phdata->philo[i].r_fork = (i + 1) % phdata->num_philo; // wrap around mechanism
 		phdata->philo[i].phdata = phdata;
+		phdata->philo[i].is_thinking = 0;
+		phdata->philo[i].ate = 0;
 		i++;
 	}
 }
