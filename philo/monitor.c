@@ -24,8 +24,11 @@ int	check_philo_death(t_phdata *phdata, int i)
 	pthread_mutex_lock(&phdata->state);
 	if (get_time() - phdata->philo[i].last_meal > phdata->time_to_die)
 	{
-		gs_logs(phdata, phdata->philo[i].id, "died");
 		lock_set_unlock(&phdata->stop_mutex, &phdata->stop_sim, 1);
+		pthread_mutex_lock(&phdata->print);
+		printf("%ld %d %s\n", get_time() - phdata->start_time, i + 1, "died");
+		pthread_mutex_unlock(&phdata->print);
+		// gs_logs(phdata, phdata->philo[i].id, "died");
 		pthread_mutex_unlock(&phdata->state);
 		return (1);
 	}
@@ -73,7 +76,7 @@ void    *gs_mont(void *arg)
 			lock_set_unlock(&phdata->stop_mutex, &phdata->stop_sim, 1);
 			return (NULL);
 		}
-		usleep(100);
+		usleep(10);
 	}
 	return (NULL);
 }
