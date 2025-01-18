@@ -57,6 +57,10 @@ void    *gs_routi(void *arg);
 int		gs_logs(t_phdata *phdata, int id, char *msg);
 int		check_dead(t_phdata *phdata);
 void	put_down_forks(t_philo *philo);
+
+void    *opt_routi(void *arg);
+void	opt_pick_order(t_philo *philo, int *first, int *second);
+void	opt_put_down_forks(t_philo *philo);
 //---------------monitor-----------------------//
 void    *gs_mont(void *arg);
 //------------------utils---------------------//

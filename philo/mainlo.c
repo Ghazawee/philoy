@@ -21,6 +21,15 @@ void	join_threads(t_phdata *phdata)
 	}
 }
 
+void create_mthreads(t_philo *philo)
+{
+	if (pthread_create(&philo->thrd, NULL, opt_routi, philo) != 0)
+	{
+		cleanup_all(philo->phdata);
+		gs_error(3);
+	}
+}
+
 void	create_threads(t_philo *philo)
 {
 	if (pthread_create(&philo->thrd, NULL, gs_routi, philo) != 0)
@@ -48,10 +57,24 @@ int	main(int ac, char **av)
 		gs_error(0);
 	gs_init_phdata(av, &phdata);
 	i = 0;
-	while (i < phdata.num_philo)
+	if(phdata.num_philo > 100)
 	{
-		create_threads(&phdata.philo[i]);
-		i++;
+		// handle_one_philo(&phdata.philo[0]);
+		// return (0);
+		printf("should be here\n");
+		while (i < phdata.num_philo)
+		{
+			create_mthreads(&phdata.philo[i]);
+			i++;
+		}
+	}
+	else
+	{
+		while (i < phdata.num_philo)
+		{
+			create_threads(&phdata.philo[i]);
+			i++;
+		}
 	}
 	create_monit(&phdata);
 	join_threads(&phdata);

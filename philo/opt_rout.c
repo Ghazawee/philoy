@@ -1,50 +1,50 @@
 #include "philo.h"
 
 
-int	gs_sleep(int time, t_philo *philo) // maybe return 0/1 if philo is dead or not
-{
-	long	start;
-
-	unsigned long t;
-	t = time;
-// 	// action = time;
-	start = get_time();
-	while (get_time() - start < t)
-	{
-		if (check_dead(philo->phdata))
-			return (1);
-		usleep(100);
-		// usleep(time/10);
-		//action -= 1;
-	}
-	return (0);
-}
-
-// int	gs_sleep(int time, t_philo *philo)
+// int	gs_sleep(int time, t_philo *philo) // maybe return 0/1 if philo is dead or not
 // {
-// 	struct timeval	begin;
-// 	struct timeval	end;
-// 	long			left;
-// 	long			passed;
-// 	long 			usec;
+// 	long	start;
 
-// 	usec = time * 1000;
-// 	passed = 0;
-// 	gettimeofday(&begin, NULL);
-// 	while (passed < usec)
+// 	unsigned long t;
+// 	t = time;
+// // 	// action = time;
+// 	start = get_time();
+// 	while (get_time() - start < t)
 // 	{
 // 		if (check_dead(philo->phdata))
 // 			return (1);
-// 		gettimeofday(&end, NULL);
-// 		passed = (end.tv_sec - begin.tv_sec) * 1000000L + (end.tv_usec - begin.tv_usec);
-// 		left = usec - passed;
-// 		if (left > 1000)
-// 			usleep(250);
+// 		usleep(100);
+// 		// usleep(time/10);
+// 		//action -= 1;
 // 	}
 // 	return (0);
 // }
 
-int	gs_logs(t_phdata *phdata, int id, char *msg)
+int	opt_sleep(int time, t_philo *philo)
+{
+	struct timeval	begin;
+	struct timeval	end;
+	long			left;
+	long			passed;
+	long 			usec;
+
+	usec = time * 1000;
+	passed = 0;
+	gettimeofday(&begin, NULL);
+	while (passed < usec)
+	{
+		if (check_dead(philo->phdata))
+			return (1);
+		gettimeofday(&end, NULL);
+		passed = (end.tv_sec - begin.tv_sec) * 1000000L + (end.tv_usec - begin.tv_usec);
+		left = usec - passed;
+		if (left > 1000)
+			usleep(250);
+	}
+	return (0);
+}
+
+int	opt_logs(t_phdata *phdata, int id, char *msg)
 {
 	pthread_mutex_lock(&phdata->print);
 	if(check_dead(phdata))
@@ -56,7 +56,7 @@ int	gs_logs(t_phdata *phdata, int id, char *msg)
 	pthread_mutex_unlock(&phdata->print);
 	return (0);
 }
-void change_permission(t_philo *philo)
+void opt_change_permission(t_philo *philo)
 {
 	// pthread_mutex_lock(&philo->phdata->waiter);
 	// if (philo->permission == philo->phdata->num_philo)
@@ -73,12 +73,12 @@ void change_permission(t_philo *philo)
 	pthread_mutex_unlock(&philo->phdata->waiter);
 }
 
-void	unlock_fork(t_philo *philo) // remove waiter from the function, this will only handle forks
+void	opt_unlock_fork(t_philo *philo) // remove waiter from the function, this will only handle forks
 {
 	int first;
 	int second;
 
-	pick_order(philo, &first, &second);
+	opt_pick_order(philo, &first, &second);
 	// pthread_mutex_lock(&philo->phdata->forks[first]);
 	// pthread_mutex_lock(&philo->phdata->forks[second]);
 	philo->phdata->forks_st[first] = 1;
@@ -87,54 +87,54 @@ void	unlock_fork(t_philo *philo) // remove waiter from the function, this will o
 	pthread_mutex_unlock(&philo->phdata->forks[first]);
 }
 
-void	philo_eat(t_philo *philo)
+void	opt_philo_eat(t_philo *philo)
 {
 	if(check_dead(philo->phdata))
 	{
-		unlock_fork(philo);
+		opt_unlock_fork(philo);
 		return ;
 	}
-	if (gs_logs(philo->phdata, philo->id, "has taken a fork"))
+	if (opt_logs(philo->phdata, philo->id, "has taken a fork"))
 	{
-		unlock_fork(philo);
+		opt_unlock_fork(philo);
 		return ;
 	}
-	if (gs_logs(philo->phdata, philo->id, "has taken a fork"))
+	if (opt_logs(philo->phdata, philo->id, "has taken a fork"))
 	{
-		unlock_fork(philo);
+		opt_unlock_fork(philo);
 		return ;
 	}
-	if (gs_logs(philo->phdata, philo->id, "is eating"))
+	if (opt_logs(philo->phdata, philo->id, "is eating"))
 	{
-		unlock_fork(philo);
+		opt_unlock_fork(philo);
 		return ;
 	}
-	if	(gs_sleep(philo->phdata->time_to_eat, philo))
+	if	(opt_sleep(philo->phdata->time_to_eat, philo))
 	{
-		unlock_fork(philo);
+		opt_unlock_fork(philo);
 		return ;
 	}
 	// unlock_fork(philo);
-	put_down_forks(philo);
+	opt_put_down_forks(philo);
 	pthread_mutex_lock(&philo->phdata->state);
 	philo->last_meal = get_time();
 	philo->meals_count++;
 	pthread_mutex_unlock(&philo->phdata->state);
-	change_permission(philo);
+	opt_change_permission(philo);
 	// usleep(philo->phdata->time_to_eat / 5);
 	// usleep(500);
 }
 
-void	*handle_one_philo(t_philo *philo)
+void	*opt_handle_one_philo(t_philo *philo)
 {
-	if (gs_logs(philo->phdata, philo->id, "is thinking"))
+	if (opt_logs(philo->phdata, philo->id, "is thinking"))
 		return (NULL);
 	usleep(philo->phdata->time_to_die * 1000);
 	return (NULL);
 }
 
 
-void	pick_order(t_philo *philo, int *first, int *second)
+void	opt_pick_order(t_philo *philo, int *first, int *second)
 {
 	if (philo->l_fork < philo->r_fork)
 	{
@@ -149,7 +149,7 @@ void	pick_order(t_philo *philo, int *first, int *second)
 }
 
 
-int	is_forks_pickable(t_philo *philo)
+int	opt_is_forks_pickable(t_philo *philo)
 {
 	int first;
 	int second;
@@ -174,7 +174,7 @@ int	is_forks_pickable(t_philo *philo)
 	pthread_mutex_unlock(&philo->phdata->forks[first]);
 	return (1);
 }
-int permission_to_eat(t_philo *philo)
+int opt_permission_to_eat(t_philo *philo)
 {
 	int permission;
 
@@ -186,13 +186,13 @@ int permission_to_eat(t_philo *philo)
 	}
 	return (permission);
 }
-int can_pickup_forks(t_philo *philo)
+int opt_can_pickup_forks(t_philo *philo)
 {
 	int first;
 	int second;
 	int f1_avail;
 	int f2_avail;
-	pick_order(philo, &first, &second);
+	opt_pick_order(philo, &first, &second);
 	pthread_mutex_lock(&philo->phdata->forks[first]);
 	f1_avail = philo->phdata->forks_st[first];
 	pthread_mutex_unlock(&philo->phdata->forks[first]);
@@ -212,9 +212,9 @@ int can_pickup_forks(t_philo *philo)
 	return (0);
 }
 
-int think_routine(t_philo *philo)
+int opt_think_routine(t_philo *philo)
 {
-	if (gs_logs(philo->phdata, philo->id, "is thinking"))
+	if (opt_logs(philo->phdata, philo->id, "is thinking"))
 		return (1);
 	// if (gs_sleep(philo->phdata->time_to_eat / 5, philo))
 	// 	return (1);
@@ -222,23 +222,23 @@ int think_routine(t_philo *philo)
 	return (0);
 }
 
-int think_wait_permission(t_philo *philo)
+int opt_wait_permission(t_philo *philo)
 {
 	
-	if (gs_sleep(philo->phdata->time_to_eat / 2, philo))
+	if (opt_sleep(philo->phdata->time_to_eat / 2, philo))
 		return (1);
-	while(!can_pickup_forks(philo))
+	while(!opt_can_pickup_forks(philo))
 	{
 		// if (gs_sleep(philo->phdata->time_to_eat / 2, philo))
 		// 	return (1);
 		usleep(100);
 	}
-	change_permission(philo);
+	opt_change_permission(philo);
 	return (0);
 }
 
 
-void	take_forks(t_philo *philo)
+void	opt_take_forks(t_philo *philo)
 {
 	int first;
 	int second;
@@ -252,7 +252,7 @@ void	take_forks(t_philo *philo)
 	// pthread_mutex_unlock(&philo->phdata->forks[second]);
 }
 
-void	put_down_forks(t_philo *philo)
+void	opt_put_down_forks(t_philo *philo)
 {
 	int first;
 	int second;
@@ -265,41 +265,41 @@ void	put_down_forks(t_philo *philo)
 	pthread_mutex_unlock(&philo->phdata->forks[first]);
 	pthread_mutex_unlock(&philo->phdata->forks[second]);
 }
-int sleep_rout(t_philo *philo)
+int opt_sleep_rout(t_philo *philo)
 {
-	if (gs_logs(philo->phdata, philo->id, "is sleeping"))
+	if (opt_logs(philo->phdata, philo->id, "is sleeping"))
 		return (1);
-	if (gs_sleep(philo->phdata->time_to_sleep, philo))
+	if (opt_sleep(philo->phdata->time_to_sleep, philo))
 		return (1);
 	return (0);
 }
 
-void    *gs_routi(void *arg)
+void    *opt_routi(void *arg)
 {
 	t_philo *philo;
 
 	philo = (t_philo *)arg;
 	if (philo->phdata->num_philo == 1)
-		return (handle_one_philo(philo));
+		return (opt_handle_one_philo(philo));
 	while(!check_dead(philo->phdata))
 	{
-		if(permission_to_eat(philo))
+		if(opt_permission_to_eat(philo))
 		{
 
-			take_forks(philo);
-			philo_eat(philo);
+			opt_take_forks(philo);
+			opt_philo_eat(philo);
 			// put_down_forks(philo);
 			if (check_dead(philo->phdata))
 				return (NULL);
-			if (sleep_rout(philo))
+			if (opt_sleep_rout(philo))
 				return (NULL);
-			change_permission(philo);
-			if (think_routine(philo))
+			opt_change_permission(philo);
+			if (opt_think_routine(philo))
 				return (NULL);
 		}
 		else
 		{
-			if (think_wait_permission(philo))
+			if (opt_wait_permission(philo))
 				return (NULL);
 		}
 	}
