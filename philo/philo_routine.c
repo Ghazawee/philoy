@@ -39,11 +39,11 @@ void	unlock_fork(t_philo *philo) // remove waiter from the function, this will o
 
 	pick_order(philo, &first, &second);
 	pthread_mutex_lock(&philo->phdata->forks[first]);
-	pthread_mutex_lock(&philo->phdata->forks[second]);
 	philo->phdata->forks_st[first] = 1;
+	pthread_mutex_unlock(&philo->phdata->forks[first]);
+	pthread_mutex_lock(&philo->phdata->forks[second]);
 	philo->phdata->forks_st[second] = 1;
 	pthread_mutex_unlock(&philo->phdata->forks[second]);
-	pthread_mutex_unlock(&philo->phdata->forks[first]);
 }
 
 void	philo_eat(t_philo *philo)
