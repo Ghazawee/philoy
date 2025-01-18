@@ -21,7 +21,7 @@ int parse_args(char **av)
 	}
 	return (0);
 }
-int get_time()
+unsigned long get_time()
 {
 	struct timeval tv;
 	if (gettimeofday(&tv, NULL) == -1)
@@ -65,7 +65,6 @@ void init_fork_mutex(t_phdata *phdata)
 	{
 		if (pthread_mutex_init(&phdata->forks[i], NULL) != 0)
 		{
-			free(phdata->f_owner);
 			free(phdata->forks_st);
 			cleanup_mutexes(phdata);
 			gs_error(4);
@@ -82,7 +81,6 @@ void init_forks_state(t_phdata *phdata)
 	while (i < phdata->num_philo)
 	{
 		phdata->forks_st[i] = 1;
-		phdata->f_owner[i] = i;
 		i++;
 	}
 }
@@ -117,8 +115,6 @@ void init_philo(t_phdata *phdata)
 		phdata->philo[i].l_fork = i ;
 		phdata->philo[i].r_fork = (i + 1) % phdata->num_philo; // wrap around mechanism
 		phdata->philo[i].phdata = phdata;
-		phdata->philo[i].is_thinking = 0;
-		phdata->philo[i].ate = 0;
 		i++;
 	}
 }
@@ -128,17 +124,10 @@ void    init_forks_philo(t_phdata *phdata)
 	phdata->forks_st = malloc(sizeof(char) * phdata->num_philo);
 	if (!phdata->forks_st)
 		gs_error(2);
-	phdata->f_owner = malloc(sizeof(int) * phdata->num_philo);
-	if (!phdata->f_owner)
-	{
-		free(phdata->forks_st);
-		gs_error(2);
-	}
 	init_forks_state(phdata);
 	phdata->forks = malloc(sizeof(pthread_mutex_t) * phdata->num_philo);
 	if (!phdata->forks)
 	{
-		free(phdata->f_owner);
 		free(phdata->forks_st);
 		gs_error(2);
 	}
@@ -147,7 +136,6 @@ void    init_forks_philo(t_phdata *phdata)
 	phdata->philo = malloc(sizeof(t_philo) * phdata->num_philo);
 	if (!phdata->philo)
 	{
-		free(phdata->f_owner);
 		free(phdata->forks_st);
 		cleanup_mutexes(phdata);
 		gs_error(2);

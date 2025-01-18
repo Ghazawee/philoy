@@ -75,8 +75,6 @@ void    *gs_mont(void *arg)
 		// 	pthread_mutex_unlock(&phdata->state);
 		// 	i++;
 		// }
-		// if (check > 0)
-		// 	usleep(check * 1000/2);
 		i = 0;
 		while (i < phdata->num_philo)
 		{
@@ -89,6 +87,8 @@ void    *gs_mont(void *arg)
 			lock_set_unlock(&phdata->stop_mutex, &phdata->stop_sim, 1);
 			return (NULL);
 		}
+		// if (check > 0) // it was 100 before
+		// 	usleep(check * 1000/2);
 		usleep(100);
 	}
 	return (NULL);

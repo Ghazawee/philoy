@@ -39,5 +39,4 @@ void cleanup_all(t_phdata *phdata)
     if(phdata->philo)
         free(phdata->philo);
     free(phdata->forks_st);
-    free(phdata->f_owner);
 }
