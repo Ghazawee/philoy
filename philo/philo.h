@@ -6,7 +6,7 @@
 /*   By: mshaheen <mshaheen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 21:42:32 by mshaheen          #+#    #+#             */
-/*   Updated: 2025/01/19 21:43:38 by mshaheen         ###   ########.fr       */
+/*   Updated: 2025/01/19 23:15:26 by mshaheen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,8 @@ typedef struct s_phdata
 	int					eat_limit;
 	unsigned long		start_time;
 	int					stop_sim;
-	char				*forks_st;
+	// char				*forks_st;
+	int					*forks_st;
 	pthread_mutex_t		*forks;
 	pthread_mutex_t		print;
 	pthread_mutex_t		state;
@@ -53,7 +54,7 @@ typedef struct s_phdata
 	pthread_t			monit;
 	t_philo				*philo;
 }						t_phdata;
-
+extern int				g_dead;
 //------------------free_error------------------//
 void					gs_error(int err);
 void					cleanup_mutexes(t_phdata *phdata);

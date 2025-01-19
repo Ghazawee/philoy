@@ -6,7 +6,7 @@
 /*   By: mshaheen <mshaheen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 21:26:31 by mshaheen          #+#    #+#             */
-/*   Updated: 2025/01/19 21:29:48 by mshaheen         ###   ########.fr       */
+/*   Updated: 2025/01/20 00:10:34 by mshaheen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void	*opt_routi(void *arg)
 		return (handle_one_philo(philo));
 	while (!check_dead(philo->phdata))
 	{
-		if (permission_to_eat(philo))
+		if(can_pickup_forks(philo))
 		{
 			take_forks(philo);
 			if (opt_philo_eat(philo))
@@ -98,11 +98,6 @@ void	*opt_routi(void *arg)
 				return (NULL);
 			}
 			if (opt_sleep_rout(philo) || think_routine(philo))
-				return (NULL);
-		}
-		else
-		{
-			if (opt_wait_permission(philo))
 				return (NULL);
 		}
 	}

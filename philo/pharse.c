@@ -6,7 +6,7 @@
 /*   By: mshaheen <mshaheen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 21:36:43 by mshaheen          #+#    #+#             */
-/*   Updated: 2025/01/19 21:38:58 by mshaheen         ###   ########.fr       */
+/*   Updated: 2025/01/19 23:16:02 by mshaheen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void	init_philo(t_phdata *phdata)
 
 void	init_forks_philo(t_phdata *phdata)
 {
-	phdata->forks_st = malloc(sizeof(char) * phdata->num_philo);
+	phdata->forks_st = malloc(sizeof(int) * phdata->num_philo);
 	if (!phdata->forks_st)
 		gs_error(2);
 	init_forks_state(phdata);

@@ -6,7 +6,7 @@
 /*   By: mshaheen <mshaheen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 21:30:45 by mshaheen          #+#    #+#             */
-/*   Updated: 2025/01/19 21:39:40 by mshaheen         ###   ########.fr       */
+/*   Updated: 2025/01/19 23:27:37 by mshaheen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,12 @@ void	init_forks_state(t_phdata *phdata)
 	i = 0;
 	while (i < phdata->num_philo)
 	{
-		phdata->forks_st[i] = 1;
+		if (i == 0 || i == phdata->num_philo - 1)
+			phdata->forks_st[i] = phdata->num_philo;
+		else if (i % 2 == 0)
+			phdata->forks_st[i] = i + 2;
+		else
+			phdata->forks_st[i] = i + 1;
 		i++;
 	}
 }

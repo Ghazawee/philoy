@@ -6,7 +6,7 @@
 /*   By: mshaheen <mshaheen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 21:30:13 by mshaheen          #+#    #+#             */
-/*   Updated: 2025/01/19 21:30:27 by mshaheen         ###   ########.fr       */
+/*   Updated: 2025/01/20 00:12:01 by mshaheen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,31 +30,6 @@ void	*handle_one_philo(t_philo *philo)
 	return (NULL);
 }
 
-int	permission_to_eat(t_philo *philo)
-{
-	int	permission;
-
-	permission = 0;
-	if (philo->permission % 2 == 0)
-	{
-		permission = 1;
-		return (permission);
-	}
-	return (permission);
-}
-
-int	wait_permission(t_philo *philo)
-{
-	if (gs_sleep(philo->phdata->time_to_eat / 2, philo))
-		return (1);
-	while (!can_pickup_forks(philo))
-	{
-		usleep(100);
-	}
-	change_permission(philo);
-	return (0);
-}
-
 void	*gs_routi(void *arg)
 {
 	t_philo	*philo;
@@ -64,7 +39,7 @@ void	*gs_routi(void *arg)
 		return (handle_one_philo(philo));
 	while (!check_dead(philo->phdata))
 	{
-		if (permission_to_eat(philo))
+		if(can_pickup_forks(philo))
 		{
 			take_forks(philo);
 			if (philo_eat(philo))
@@ -73,11 +48,6 @@ void	*gs_routi(void *arg)
 				return (NULL);
 			}
 			if (sleep_rout(philo) || think_routine(philo))
-				return (NULL);
-		}
-		else
-		{
-			if (wait_permission(philo))
 				return (NULL);
 		}
 	}
