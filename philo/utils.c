@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mshaheen <mshaheen@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/19 21:30:45 by mshaheen          #+#    #+#             */
+/*   Updated: 2025/01/19 21:39:40 by mshaheen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
-int is_digit(char c)
+int	is_digit(char c)
 {
 	if (c >= '0' && c <= '9')
 		return (1);
@@ -36,17 +48,48 @@ int	ft_atoi(const char *s)
 	return (r * sign);
 }
 
-// void	*ft_calloc(size_t count, size_t size)
-// {
-// 	unsigned char	*s;
-// 	unsigned int	i;
+int	parse_args(char **av)
+{
+	int	i;
+	int	j;
 
-// 	if (size && count > (SIZE_MAX / size))
-// 		return (NULL);
-// 	i = count * size;
-// 	s = malloc(i);
-// 	if (!s)
-// 		return (NULL);
-// 	ft_memset(s, 0, i);
-// 	return (s);
-// }
+	i = 1;
+	while (av[i])
+	{
+		if (av[i][0] == '\0')
+			return (1);
+		j = 0;
+		while (av[i][j])
+		{
+			if (!is_digit(av[i][j]))
+				return (1);
+			j++;
+		}
+		i++;
+	}
+	return (0);
+}
+
+unsigned long	get_time(void)
+{
+	struct timeval	tv;
+
+	if (gettimeofday(&tv, NULL) == -1)
+	{
+		printf("Error: gettimeofday failed\n");
+		exit(1);
+	}
+	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+}
+
+void	init_forks_state(t_phdata *phdata)
+{
+	int	i;
+
+	i = 0;
+	while (i < phdata->num_philo)
+	{
+		phdata->forks_st[i] = 1;
+		i++;
+	}
+}

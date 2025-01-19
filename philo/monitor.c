@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   monitor.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mshaheen <mshaheen@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/19 21:21:42 by mshaheen          #+#    #+#             */
+/*   Updated: 2025/01/19 21:26:19 by mshaheen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 void	lock_set_unlock(pthread_mutex_t *mutex, int *var, int value)
@@ -24,7 +36,6 @@ int	check_philo_death(t_phdata *phdata, int i)
 	pthread_mutex_lock(&phdata->state);
 	if (get_time() - phdata->philo[i].last_meal > phdata->time_to_die)
 	{
-
 		lock_set_unlock(&phdata->stop_mutex, &phdata->stop_sim, 1);
 		pthread_mutex_lock(&phdata->print);
 		printf("%ld %d %s\n", get_time() - phdata->start_time, i + 1, "died");
@@ -38,8 +49,8 @@ int	check_philo_death(t_phdata *phdata, int i)
 
 int	check_eat_limit(t_phdata *phdata)
 {
-	int i;
-	int count;
+	int	i;
+	int	count;
 
 	i = 0;
 	count = 0;
@@ -56,25 +67,14 @@ int	check_eat_limit(t_phdata *phdata)
 	return (0);
 }
 
-void    *gs_mont(void *arg)
+void	*gs_mont(void *arg)
 {
-	t_phdata *phdata;
-	int i;
+	t_phdata	*phdata;
+	int			i;
 
 	phdata = (t_phdata *)arg;
 	while (!check_dead(phdata))
 	{
-		// i = 0;
-		// long check = phdata-> time_to_die;
-		// while(i < phdata->num_philo)
-		// {
-		// 	pthread_mutex_lock(&phdata->state);
-		// 	long remains = phdata->philo[i].last_meal + phdata->time_to_die - get_time();
-		// 	if (remains < check)
-		// 		check = remains;
-		// 	pthread_mutex_unlock(&phdata->state);
-		// 	i++;
-		// }
 		i = 0;
 		while (i < phdata->num_philo)
 		{
@@ -87,8 +87,6 @@ void    *gs_mont(void *arg)
 			lock_set_unlock(&phdata->stop_mutex, &phdata->stop_sim, 1);
 			return (NULL);
 		}
-		// if (check > 0) // it was 100 before
-		// 	usleep(check * 1000/2);
 		usleep(100);
 	}
 	return (NULL);

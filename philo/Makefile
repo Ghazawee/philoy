@@ -5,6 +5,8 @@ SRC = mainlo.c \
 	utils.c\
 	free_error.c\
 	philo_routine.c\
+	actions.c\
+	forking.c\
 	monitor.c\
 	opt_rout.c\
 

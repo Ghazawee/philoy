@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   mainlo.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mshaheen <mshaheen@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/19 21:25:23 by mshaheen          #+#    #+#             */
+/*   Updated: 2025/01/19 21:52:20 by mshaheen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 void	join_threads(t_phdata *phdata)
@@ -10,18 +22,18 @@ void	join_threads(t_phdata *phdata)
 		if (pthread_join(phdata->philo[i].thrd, NULL) != 0)
 		{
 			cleanup_all(phdata);
-			gs_error(3); // add new error msg for join failing
+			gs_error(5);
 		}
 		i++;
 	}
 	if (pthread_join(phdata->monit, NULL) != 0)
 	{
 		cleanup_all(phdata);
-		gs_error(3);
+		gs_error(5);
 	}
 }
 
-void create_mthreads(t_philo *philo)
+void	create_mthreads(t_philo *philo)
 {
 	if (pthread_create(&philo->thrd, NULL, opt_routi, philo) != 0)
 	{
@@ -53,28 +65,19 @@ int	main(int ac, char **av)
 	t_phdata	phdata;
 	int			i;
 
-	if(ac != 5 && ac != 6)
+	if (ac != 5 && ac != 6)
 		gs_error(0);
 	gs_init_phdata(av, &phdata);
-	i = 0;
-	if(phdata.num_philo > 100)
+	i = -1;
+	if (phdata.num_philo > 100)
 	{
-		// handle_one_philo(&phdata.philo[0]);
-		// return (0);
-		printf("should be here\n");
-		while (i < phdata.num_philo)
-		{
+		while (++i < phdata.num_philo)
 			create_mthreads(&phdata.philo[i]);
-			i++;
-		}
 	}
 	else
 	{
-		while (i < phdata.num_philo)
-		{
+		while (++i < phdata.num_philo)
 			create_threads(&phdata.philo[i]);
-			i++;
-		}
 	}
 	create_monit(&phdata);
 	join_threads(&phdata);
